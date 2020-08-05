@@ -47,4 +47,4 @@ Logs in console are related to the `attributeChangedCallback` method, which shou
 
 This is **not** a _ShadowDOM_ polyfill, exactly the same as [document-register-element](https://github.com/WebReflection/document-register-element) was never about _ShadowDOM_, simply because that's a different part of the Web Components umbrella, and because _ShadowDOM_ is not mandatory at all for custom elements.
 
-This is just the current Custom Elements V1 as specified by standard bodies, finally free from constructor caveats, and rewritten from scratch to target the real-world browsers everyone uses these days.
+This is just the current [Custom Elements V1 as specified by standard bodies](https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-api), finally free from constructor caveats, and rewritten from scratch to target the real-world browsers everyone uses these days.

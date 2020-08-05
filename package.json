@@ -41,5 +41,13 @@
     "@webreflection/custom-elements-builtin": "^0.1.7",
     "@webreflection/lie": "^0.1.1",
     "qsa-observer": "^1.1.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/custom-elements-ie.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WebReflection/custom-elements-ie/issues"
+  },
+  "homepage": "https://github.com/WebReflection/custom-elements-ie#readme"
 }

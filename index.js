@@ -233,6 +233,7 @@
 
   var attachShadow = Element.prototype.attachShadow;
   var defineProperty$1 = Object.defineProperty,
+      getOwnPropertyNames = Object.getOwnPropertyNames,
       setPrototypeOf$1 = Object.setPrototypeOf;
   var _customElements = customElements,
       define = _customElements.define,
@@ -329,8 +330,8 @@
   };
 
   var override$1 = null;
-  Object.getOwnPropertyNames(self).filter(function (k) {
-    return typeof k == 'string' && /^HTML(?!Element)/.test(k);
+  getOwnPropertyNames(self).filter(function (k) {
+    return /^HTML(?!Element)/.test(k);
   }).forEach(function (k) {
     function HTMLBuiltIn() {
       var constructor = this.constructor;

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run cjs && npm run rollup:babel && npm run patch && npm run rollup:test && npm run min && npm run size",
     "cjs": "ascjs esm cjs",
-    "patch": "sed -i.bck 's/Reflect.ownKeys/Object.getOwnPropertyNames/; s/new Promise/new Lie/; s/.*setPrototypeOf.*HTMLBuiltIn.*//' index.js && rm -rf index.js.bck",
+    "patch": "sed -i.bck 's/new Promise/new Lie/; s/.*setPrototypeOf.*HTMLBuiltIn.*//' index.js && rm -rf index.js.bck",
     "rollup:babel": "rollup --config rollup/babel.config.js",
     "rollup:test": "rollup --config rollup/test.config.js",
     "min": "terser index.js --comments='/^!/' -c -m -o min.js",
@@ -38,7 +38,7 @@
   },
   "unpkg": "min.js",
   "dependencies": {
-    "@webreflection/custom-elements-builtin": "^0.1.7",
+    "@webreflection/custom-elements-builtin": "^0.1.8",
     "@webreflection/lie": "^0.1.1",
     "qsa-observer": "^1.1.2"
   },

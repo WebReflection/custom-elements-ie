@@ -116,126 +116,128 @@
     };
   });
 
-  var defineProperty = Object.defineProperty,
-      setPrototypeOf = Object.setPrototypeOf;
-  var classes = new Map();
-  var defined = new Map();
-  var prototypes = new Map();
-  var registry = new Map();
-  var query = [];
+  if (!self.customElements) {
+    var HTMLBuiltIn = function HTMLBuiltIn() {
+      var constructor = this.constructor;
+      if (!classes.has(constructor)) throw new TypeError('Illegal constructor');
+      var is = classes.get(constructor);
+      if (override) return augment(override, is);
+      var element = createElement.call(document, is);
+      return augment(setPrototypeOf(element, constructor.prototype), is);
+    };
 
-  var attributeChanged = function attributeChanged(records) {
-    for (var i = 0, length = records.length; i < length; i++) {
-      var _records$i = records[i],
-          target = _records$i.target,
-          attributeName = _records$i.attributeName,
-          oldValue = _records$i.oldValue;
-      var newValue = target.getAttribute(attributeName);
-      target.attributeChangedCallback(attributeName, oldValue, newValue);
-    }
-  };
+    var defineProperty = Object.defineProperty,
+        setPrototypeOf = Object.setPrototypeOf;
+    var classes = new Map();
+    var defined = new Map();
+    var prototypes = new Map();
+    var registry = new Map();
+    var query = [];
 
-  var augment = function augment(element, is) {
-    var attributeFilter = element.constructor.observedAttributes;
-
-    if (attributeFilter) {
-      whenDefined(is).then(function () {
-        new MutationObserver(attributeChanged).observe(element, {
-          attributes: true,
-          attributeOldValue: true,
-          attributeFilter: attributeFilter
-        });
-        attributeFilter.forEach(function (attributeName) {
-          if (element.hasAttribute(attributeName)) element.attributeChangedCallback(attributeName, null, element.getAttribute(attributeName));
-        });
-      });
-    }
-
-    return element;
-  };
-
-  var handle = function handle(element, connected, selector) {
-    var proto = prototypes.get(selector);
-
-    if (connected && !proto.isPrototypeOf(element)) {
-      override = setPrototypeOf(element, proto);
-
-      try {
-        new proto.constructor();
-      } finally {
-        override = null;
+    var attributeChanged = function attributeChanged(records) {
+      for (var i = 0, length = records.length; i < length; i++) {
+        var _records$i = records[i],
+            target = _records$i.target,
+            attributeName = _records$i.attributeName,
+            oldValue = _records$i.oldValue;
+        var newValue = target.getAttribute(attributeName);
+        target.attributeChangedCallback(attributeName, oldValue, newValue);
       }
-    }
+    };
 
-    var method = "".concat(connected ? '' : 'dis', "connectedCallback");
-    if (method in proto) element[method]();
-  };
+    var augment = function augment(element, is) {
+      var attributeFilter = element.constructor.observedAttributes;
 
-  var _qsaObserver = qsaObserver({
-    query: query,
-    handle: handle
-  }),
-      parse = _qsaObserver.parse;
-
-  var override = null;
-
-  var whenDefined = function whenDefined(name) {
-    if (!defined.has(name)) {
-      var _,
-          $ = new Lie(function ($) {
-        _ = $;
-      });
-
-      defined.set(name, {
-        $: $,
-        _: _
-      });
-    }
-
-    return defined.get(name).$;
-  };
-
-  defineProperty(self, 'customElements', {
-    configurable: true,
-    writable: true,
-    value: {
-      define: function define(is, Class) {
-        if (registry.has(is)) throw new Error("the name \"".concat(is, "\" has already been used with this registry"));
-        classes.set(Class, is);
-        prototypes.set(is, Class.prototype);
-        registry.set(is, Class);
-        query.push(is);
+      if (attributeFilter) {
         whenDefined(is).then(function () {
-          parse(document.querySelectorAll(is));
+          new MutationObserver(attributeChanged).observe(element, {
+            attributes: true,
+            attributeOldValue: true,
+            attributeFilter: attributeFilter
+          });
+          attributeFilter.forEach(function (attributeName) {
+            if (element.hasAttribute(attributeName)) element.attributeChangedCallback(attributeName, null, element.getAttribute(attributeName));
+          });
+        });
+      }
+
+      return element;
+    };
+
+    var handle = function handle(element, connected, selector) {
+      var proto = prototypes.get(selector);
+
+      if (connected && !proto.isPrototypeOf(element)) {
+        override = setPrototypeOf(element, proto);
+
+        try {
+          new proto.constructor();
+        } finally {
+          override = null;
+        }
+      }
+
+      var method = "".concat(connected ? '' : 'dis', "connectedCallback");
+      if (method in proto) element[method]();
+    };
+
+    var _qsaObserver = qsaObserver({
+      query: query,
+      handle: handle
+    }),
+        parse = _qsaObserver.parse;
+
+    var override = null;
+
+    var whenDefined = function whenDefined(name) {
+      if (!defined.has(name)) {
+        var _,
+            $ = new Lie(function ($) {
+          _ = $;
         });
 
-        defined.get(is)._();
-      },
-      get: function get(selector) {
-        return registry.get(selector);
-      },
-      whenDefined: whenDefined
-    }
-  });
-  (HTMLBuiltIn.prototype = HTMLElement.prototype).constructor = HTMLBuiltIn;
-  defineProperty(self, 'HTMLElement', {
-    value: HTMLBuiltIn
-  }); // in case ShadowDOM is used through a polyfill, to avoid issues
-  // with builtin extends within shadow roots
+        defined.set(name, {
+          $: $,
+          _: _
+        });
+      }
 
-  if (!('isConnected' in Node.prototype)) defineProperty(Node.prototype, 'isConnected', {
-    get: function get() {
-      return !(this.ownerDocument.compareDocumentPosition(this) & this.DOCUMENT_POSITION_DISCONNECTED);
-    }
-  });
+      return defined.get(name).$;
+    };
 
-  function HTMLBuiltIn() {
-    var constructor = this.constructor;
-    if (!classes.has(constructor)) throw new TypeError('Illegal constructor');
-    var is = classes.get(constructor);
-    if (override) return augment(override, is);
-    var element = createElement.call(document, is);
-    return augment(setPrototypeOf(element, constructor.prototype), is);
+    defineProperty(self, 'customElements', {
+      configurable: true,
+      writable: true,
+      value: {
+        define: function define(is, Class) {
+          if (registry.has(is)) throw new Error("the name \"".concat(is, "\" has already been used with this registry"));
+          classes.set(Class, is);
+          prototypes.set(is, Class.prototype);
+          registry.set(is, Class);
+          query.push(is);
+          whenDefined(is).then(function () {
+            parse(document.querySelectorAll(is));
+          });
+
+          defined.get(is)._();
+        },
+        get: function get(selector) {
+          return registry.get(selector);
+        },
+        whenDefined: whenDefined
+      }
+    });
+    (HTMLBuiltIn.prototype = HTMLElement.prototype).constructor = HTMLBuiltIn;
+    defineProperty(self, 'HTMLElement', {
+      value: HTMLBuiltIn
+    }); // in case ShadowDOM is used through a polyfill, to avoid issues
+    // with builtin extends within shadow roots
+
+    if (!('isConnected' in Node.prototype)) defineProperty(Node.prototype, 'isConnected', {
+      get: function get() {
+        return !(this.ownerDocument.compareDocumentPosition(this) & this.DOCUMENT_POSITION_DISCONNECTED);
+      }
+    });
   }
 
   var attachShadow = Element.prototype.attachShadow;

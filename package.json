@@ -41,7 +41,7 @@
   "unpkg": "min.js",
   "dependencies": {
     "@webreflection/custom-elements-builtin": "^0.1.9",
-    "@webreflection/custom-elements-no-builtin": "^0.1.1"
+    "@webreflection/custom-elements-no-builtin": "^0.1.2"
   },
   "repository": {
     "type": "git",

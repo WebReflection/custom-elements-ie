@@ -4,7 +4,9 @@
   "description": "A better custom-elements-builtin polyfill, IE11+",
   "main": "./cjs/index.js",
   "scripts": {
-    "build": "npm run cjs && npm run rollup:babel && npm run patch && npm run rollup:test && npm run min && npm run size",
+    "build": "npm run copy:ce && npm run copy:bi && npm run cjs && npm run rollup:babel && npm run patch && npm run rollup:test && npm run min && npm run size",
+    "copy:ce": "cp node_modules/@webreflection/custom-elements-no-builtin/esm/index.js esm/custom-elements.js",
+    "copy:bi": "cp node_modules/@webreflection/custom-elements-builtin/esm/index.js esm/builtin.js",
     "cjs": "ascjs esm cjs",
     "patch": "sed -i.bck 's/new Promise/new Lie/; s/.*setPrototypeOf.*HTMLBuiltIn.*//' index.js && rm -rf index.js.bck",
     "rollup:babel": "rollup --config rollup/babel.config.js",
@@ -39,8 +41,7 @@
   "unpkg": "min.js",
   "dependencies": {
     "@webreflection/custom-elements-builtin": "^0.1.9",
-    "@webreflection/lie": "^0.1.1",
-    "qsa-observer": "^1.1.2"
+    "@webreflection/custom-elements-no-builtin": "0.0.1"
   },
   "repository": {
     "type": "git",

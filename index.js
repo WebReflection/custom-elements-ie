@@ -217,9 +217,16 @@
       whenDefined: whenDefined
     }
   });
-  HTMLBuiltIn.prototype = HTMLElement.prototype;
+  (HTMLBuiltIn.prototype = HTMLElement.prototype).constructor = HTMLBuiltIn;
   defineProperty(self, 'HTMLElement', {
     value: HTMLBuiltIn
+  }); // in case ShadowDOM is used through a polyfill, to avoid issues
+  // with builtin extends within shadow roots
+
+  if (!('isConnected' in Node.prototype)) defineProperty(Node.prototype, 'isConnected', {
+    get: function get() {
+      return !(this.ownerDocument.compareDocumentPosition(this) & this.DOCUMENT_POSITION_DISCONNECTED);
+    }
   });
 
   function HTMLBuiltIn() {
@@ -277,6 +284,10 @@
     }
 
     return element;
+  };
+
+  var getCE = function getCE(name) {
+    return registry$1.get(name) || get.call(customElements, name);
   };
 
   var handle$1 = function handle(element, connected, selector) {
@@ -377,7 +388,7 @@
       var tag = options && options["extends"];
 
       if (tag) {
-        if (registry$1.has(is)) throw new Error("the name \"".concat(is, "\" has already been used with this registry"));
+        if (getCE(is)) throw new Error("the name \"".concat(is, "\" has already been used with this registry"));
         selector = "".concat(tag, "[is=\"").concat(is, "\"]");
         classes$1.set(Class, {
           is: is,
@@ -402,9 +413,7 @@
     }
   });
   defineProperty$1(customElements, 'get', {
-    value: function value(name) {
-      return registry$1.get(name) || get.call(customElements, name);
-    }
+    value: getCE
   });
   defineProperty$1(customElements, 'whenDefined', {
     value: whenDefined$1

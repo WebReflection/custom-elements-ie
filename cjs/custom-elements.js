@@ -86,8 +86,20 @@ defineProperty(self, 'customElements', {
   }
 });
 
-HTMLBuiltIn.prototype = HTMLElement.prototype;
+(HTMLBuiltIn.prototype = HTMLElement.prototype).constructor = HTMLBuiltIn;
 defineProperty(self, 'HTMLElement', {value: HTMLBuiltIn});
+
+// in case ShadowDOM is used through a polyfill, to avoid issues
+// with builtin extends within shadow roots
+if (!('isConnected' in Node.prototype))
+  defineProperty(Node.prototype, 'isConnected', {
+    get() {
+      return !(
+        this.ownerDocument.compareDocumentPosition(this) &
+        this.DOCUMENT_POSITION_DISCONNECTED
+      );
+    }
+  });
 
 function HTMLBuiltIn() {
   const {constructor} = this;
